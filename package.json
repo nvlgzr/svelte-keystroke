@@ -1,0 +1,25 @@
+{
+  "name": "svelte-keystroke",
+  "version": "1.0.0",
+  "description": "A key-stroke observer for Svelte, focussed on simplicity",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "keyboard",
+    "keystrokes",
+    "keydown",
+    "keyup",
+    "simple",
+    "svelte",
+    "svelte component",
+    "combo",
+    "shortcuts",
+    "escape",
+    "meta",
+    "enter"
+  ],
+  "author": "Elbong Gearny (https://github.com/navelgazer)",
+  "license": "ISC"
+}
