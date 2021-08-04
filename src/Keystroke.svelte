@@ -7,10 +7,8 @@
    * @event {string} heldKeys
    */
 
-  export let hasShift = false;
-  export let hasControl = false;
-  export let hasAlt = false;
-  export let hasMeta = false;
+  let hasShift = false;
+  let hasAlt = false;
 
   let heldKeys = new Set();
   let modifiers = new Set();
@@ -18,9 +16,7 @@
   let pausedForMeta = false; // See note below re: Meta
 
   $: hasShift = modifiers.has("Shift");
-  $: hasControl = modifiers.has("Control");
   $: hasAlt = modifiers.has("Alt");
-  $: hasMeta = modifiers.has("Meta");
 
   $: shiftOnly = hasShift && modifiers.size === 1;
   $: altOnly = hasAlt && modifiers.size === 1;
@@ -33,6 +29,7 @@
   //   https://codepen.io/alexduloz/pen/nteqG
 
   /*
+  TODO: Migrate this ↑ and this ↓ to README
    * 2+ held keys triggers heldKeys.
    *
    * Single character entry triggers a single stroke.
