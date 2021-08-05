@@ -1,3 +1,5 @@
+![Issues Badge](https://img.shields.io/github/issues/nvlgzr/svelte-keystroke)
+
 <img src="lonekey.jpg" alt="photo of antique keyboard with all the keys removed except for a key whose combination of : and > combine into a smiley face" width="25%" height="25%" style="float:right;" />
 
 # svelte-keystroke
