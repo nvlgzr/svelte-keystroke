@@ -1,99 +1,20 @@
 <script>
   import { createEventDispatcher } from "svelte";
-
-  /**
-   * @event {string} stroke
-   * @event {string} combo
-   * @event {string} heldKeys
-   */
-
-  let hasShift = false;
-  let hasAlt = false;
-
-  let heldKeys = new Set();
-  let modifiers = new Set();
-  let strokes = [];
-  let pausedForMeta = false; // See note below re: Meta
-
-  $: hasShift = modifiers.has("Shift");
-  $: hasAlt = modifiers.has("Alt");
-
-  $: shiftOnly = hasShift && modifiers.size === 1;
-  $: altOnly = hasAlt && modifiers.size === 1;
+  import { emptyModel, down, up } from "./pure-functions.js";
 
   const dispatch = createEventDispatcher();
-  const validMods = ["Shift", "Control", "Alt"];
-  // ↑ "Meta" not supported because of OS issues (see links ↓).
-  //   Basically, Keystroke leaves all ⌘ shortcuts to the browser.
-  //   https://stackoverflow.com/a/27512489/230615
-  //   https://codepen.io/alexduloz/pen/nteqG
+  let model = emptyModel;
 
-  /*
-  TODO: Migrate this ↑ and this ↓ to README
-   * 2+ held keys triggers heldKeys.
-   *
-   * Single character entry triggers a single stroke.
-   * Single characters often come through modified by Shift or Alt.
-   *
-   * Such cases also get reported as combos. Combos represent any
-   * keypress accompanied by still-held modifiers.
-   */
-  const maybeDispatch = (key) => {
-    if (pausedForMeta) return;
-
-    if (heldKeys.size > 1) {
-      dispatch("heldKeys", heldKeys);
-    }
-
-    if (shiftOnly || altOnly || !modifiers.size) {
-      strokes.push(key);
-      dispatch("stroke", key);
-      dispatch(key); // Allows bindings such as <Keystroke on:Enter={…} />
-    }
-
-    if (modifiers.size) {
-      const matchValidModOrder = (l, r) =>
-        validMods.indexOf(l) > validMods.indexOf(r);
-      dispatch(
-        "combo",
-        Array.from(modifiers).sort(matchValidModOrder).join("+") + "+" + key
-      );
-    }
+  const keydown = (keydownEvent) => {
+    model = down(keydownEvent, model);
+    do {
+      let event = model.pendingDispatches.pop();
+      if (event) dispatch(event.name, event.value);
+    } while (model.pendingDispatches.length);
   };
 
-  const keydown = (e) => {
-    const key = e.key;
-
-    if (key === "Meta") {
-      pausedForMeta = true;
-    }
-
-    if (pausedForMeta) {
-      heldKeys.clear();
-    } else {
-      heldKeys.add(key);
-    }
-
-    if (validMods.includes(key)) {
-      modifiers.add(key);
-      modifiers = modifiers; // updates hasShift, et al
-    }
-
-    maybeDispatch(key);
-  };
-
-  const keyup = (e) => {
-    const key = e.key;
-
-    if (key === "Meta") {
-      pausedForMeta = false;
-    }
-
-    heldKeys.delete(key);
-    modifiers.delete(key);
-
-    heldKeys = heldKeys;
-    modifiers = modifiers;
+  const keyup = (keyupEvent) => {
+    model = up(keyupEvent, model);
   };
 </script>
 
