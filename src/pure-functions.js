@@ -1,5 +1,5 @@
 export let emptyModel = {
-  heldKeys: [],
+  heldKeys: new Map(),
   modifiers: new Set(),
   strokes: [],
   pausedForMeta: false, // See note below re: Meta
@@ -30,15 +30,23 @@ const maybeCreateDispatches = (key, model = emptyModel) => {
 
   let m = { ...model }
 
-  if (m.heldKeys.length > 1) {
-    const v = { name: "heldKeys", value: m.heldKeys.map(k => k.key) }
-    m.pendingDispatches.push(v);
+  if (m.heldKeys.size > 1) {
+    m.pendingDispatches.push({
+      name: "heldKeys",
+      value: Array.from(m.heldKeys.values())
+    });
   }
 
   if (shiftOnly || altOnly || !modifiers.size) {
     m.strokes.push(key);
-    m.pendingDispatches.push({ name: "stroke", value: key });
-    m.pendingDispatches.push({ name: key, value: key }) // Allows bindings such as <Keystroke on:Enter={…} />
+    m.pendingDispatches.push({
+      name: "stroke",
+      value: key
+    });
+    m.pendingDispatches.push({
+      name: key,
+      value: key
+    }) // Allows bindings such as <Keystroke on:Enter={…} />
   }
 
   if (m.modifiers.size && !m.modifiers.has(key)) {
@@ -60,11 +68,11 @@ export const down = (e, model) => {
   }
 
   if (m.pausedForMeta) {
-    m.heldKeys = []
+    m.heldKeys.clear()
   } else {
-    const alreadyInThere = m.heldKeys.filter(k => k.keyCode === keyCode).length
+    const alreadyInThere = m.heldKeys.get(keyCode)
     if (!alreadyInThere) {
-      m.heldKeys.push({ key, keyCode })
+      m.heldKeys.set(keyCode, key)
     }
   }
 
@@ -85,8 +93,7 @@ export const up = (e, model) => {
   }
 
   m.modifiers.delete(key);
-  // Can't use `delete` here ↓ cause objs in sets are compared by reference.
-  m.heldKeys = m.heldKeys.filter(el => el.keyCode !== keyCode)
+  m.heldKeys.delete(keyCode)
 
   return m
 };
