@@ -1,6 +1,6 @@
 {
   "name": "svelte-keystroke",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A key-stroke observer for Svelte, focussed on simplicity",
   "main": "dist/index.js",
   "type": "module",
