@@ -41,7 +41,7 @@ const maybeCreateDispatches = (key, model = emptyModel) => {
     m.pendingDispatches.push({ name: key, value: key }) // Allows bindings such as <Keystroke on:Enter={…} />
   }
 
-  if (m.modifiers.size) {
+  if (m.modifiers.size && !m.modifiers.has(key)) {
     const matchValidModOrder = (l, r) =>
       validMods.indexOf(l) > validMods.indexOf(r);
     m.pendingDispatches.push({ name: "combo", value: Array.from(m.modifiers).sort(matchValidModOrder).join("+") + "+" + key })
